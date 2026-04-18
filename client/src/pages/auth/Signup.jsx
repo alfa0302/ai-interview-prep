@@ -14,6 +14,25 @@ export default function Signup({ setCurrentPage }) {
   const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
+    let ProfileImageUrl = "";
+    if (!fullName) {
+      return setError("Please enter name");
+    }
+    if (!validateEmail(email)) {
+      return setError("Please enter a valid email address");
+    }
+    if (!password) {
+      return setError("Please enter the password");
+    }
+    setError("");
+    try {
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("Something went wrong");
+      }
+    }
   };
   return (
     <div className="">
