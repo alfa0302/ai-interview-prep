@@ -39,7 +39,7 @@ const registerUser = async (req, res) => {
 };
 
 // @desc   login user
-// @route  POST /api/auth/register
+// @route  POST /api/auth/login
 // access  Public
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
