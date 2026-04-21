@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LuSparkles } from "react-icons/lu";
 
@@ -7,13 +7,22 @@ import { APP_FEATURES } from "../utils/data";
 import Modal from "../components/Modal";
 import Login from "../pages/auth/Login";
 import SignUp from "../pages/auth/SignUp";
+import { UserContext } from "../context/UserContext";
+import ProfileInfoCard from "../components/cards/ProfileInfoCard";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { user } = useContext(UserContext);
   const [openAuthModel, setOpenAuthModel] = useState(false);
   const [currentPage, setCurrentPage] = useState("login");
 
-  const handleCTA = () => {};
+  const handleCTA = () => {
+    if (!user) {
+      setOpenAuthModel(true);
+    } else {
+      navigate("/dashboard");
+    }
+  };
 
   return (
     <>
@@ -25,12 +34,16 @@ export default function LandingPage() {
               <div className="text-[18px] sm:text-[22px]">
                 Interview Prep AI
               </div>
-              <button
-                className="bg-linear-to-r from-primary to-[#e99a4b] text-white text-sm px-5 py-1.5 rounded-full cursor-pointer"
-                onClick={() => setOpenAuthModel(true)}
-              >
-                Login / Sign Up
-              </button>
+              {user ? (
+                <ProfileInfoCard />
+              ) : (
+                <button
+                  className="bg-linear-to-r from-primary to-[#e99a4b] text-white text-sm px-5 py-1.5 rounded-full cursor-pointer"
+                  onClick={() => setOpenAuthModel(true)}
+                >
+                  Login / Sign Up
+                </button>
+              )}
             </header>
             {/* hero content */}
             <div className="flex md:flex-row flex-col gap-3">

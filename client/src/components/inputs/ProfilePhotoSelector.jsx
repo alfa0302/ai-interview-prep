@@ -32,13 +32,14 @@ export default function ProfilePhotoSelector({
     inputRef.current.click();
   };
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center relative z-0 ">
       <input
         type="file"
         accept="image/*"
         ref={inputRef}
         onChange={handleImageChange}
         className="hidden"
+        name="profilePic"
       />
       {!image ? (
         <div className="w-22 h-22 rounded-full bg-amber-100 relative flex flex-col justify-center items-center">

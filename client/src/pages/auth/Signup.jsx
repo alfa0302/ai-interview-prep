@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Input from "../../components/inputs/Input.jsx";
 import ProfilePhotoSelector from "../../components/inputs/ProfilePhotoSelector.jsx";
 import { validateEmail } from "../../utils/helper.js";
+import { UserContext } from "../../context/UserContext.jsx";
+import axiosInstance from "../../utils/axiosInstance.js";
+import { API_PATHS } from "../../utils/apiPaths.js";
+import uploadImage from "../../utils/uploadImage.js";
 
 export default function Signup({ setCurrentPage }) {
+  const { updateUser } = useContext(UserContext);
   const [profilePic, setProfilePic] = useState(null);
   const [preview, setPreview] = useState(null);
   const [fullName, setFullName] = useState("");
@@ -12,9 +17,10 @@ export default function Signup({ setCurrentPage }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let ProfileImageUrl = "";
+    console.log("fun triggered");
+    let profileImageUrl = "";
     if (!fullName) {
       return setError("Please enter name");
     }
@@ -26,6 +32,22 @@ export default function Signup({ setCurrentPage }) {
     }
     setError("");
     try {
+      if (profilePic) {
+        const imageUploadRes = await uploadImage(profilePic);
+        profileImageUrl = imageUploadRes.imageUrl || "";
+      }
+      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
+        name: fullName,
+        email,
+        password,
+        profileImageUrl,
+      });
+      const { token } = response.data;
+      if (token) {
+        localStorage.setItem("token", token);
+        updateUser(response.data);
+        navigate("/dashboard");
+      }
     } catch (error) {
       if (error.response && error.response.data.message) {
         setError(error.response.data.message);
@@ -65,7 +87,10 @@ export default function Signup({ setCurrentPage }) {
           value={password}
         />
         {error && <p className="text-sm text-red-600">{error}</p>}
-        <button className="text-white bg-black rounded-md p-2 cursor-pointer hover:bg-amber-100 border hover:border-amber-600 hover:text-black">
+        <button
+          className="text-white bg-black rounded-md p-2 cursor-pointer hover:bg-amber-100 border hover:border-amber-600 hover:text-black"
+          type="submit"
+        >
           SIGN UP
         </button>
       </form>
