@@ -5,3 +5,14 @@ export function validateEmail(email) {
   }
   return true;
 }
+
+export const getInitials = (title) => {
+  if (!title) return "";
+  return title
+    .split(" ")
+    .filter((word) => word)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+};

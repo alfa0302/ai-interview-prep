@@ -12,7 +12,7 @@ Context:
 - Focus Topics: ${topicsToFocus}
 
 Instructions:
-1. Generate exactly ${numberOfQuestions} technical interview questions.
+1. Generate exactly ${numberOfQuestions || 5} technical interview questions.
 2. Each question must be relevant to the given role and experience level.
 3. Focus strictly on the provided topics.
 4. Questions should vary in difficulty (easy → medium → hard).

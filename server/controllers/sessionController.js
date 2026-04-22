@@ -101,7 +101,7 @@ const deleteSession = async (req, res) => {
     //delete all questions linked to session
     await Question.deleteMany({ session: session._id });
     // delete session
-    await Session.deleteOne();
+    await session.deleteOne();
     res.status(200).json({ message: "Session deleted successfully" });
   } catch (error) {
     res

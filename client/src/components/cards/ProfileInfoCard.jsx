@@ -1,11 +1,14 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
 
 export default function ProfileInfoCard() {
   const { user, clearUser } = useContext(UserContext);
+  const navigate = useNavigate();
   const handleLogOut = () => {
     localStorage.clear();
     clearUser();
+    navigate("/");
   };
   return (
     user && (
