@@ -4,7 +4,14 @@ const questionSchema = new mongoose.Schema(
   {
     session: { type: mongoose.Schema.Types.ObjectId, ref: "Session" },
     question: String,
-    answer: String,
+    answer: {
+      explanation: String,
+      bestPractices: [String],
+      code: {
+        language: String,
+        content: String,
+      },
+    },
     note: String,
     isPinned: { type: Boolean, deafult: false },
   },

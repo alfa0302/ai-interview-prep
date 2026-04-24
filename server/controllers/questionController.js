@@ -20,6 +20,7 @@ const addQuestionsToSession = async (req, res) => {
       questions.map((q) => ({
         session: sessionId,
         question: q.question,
+        // question: JSON.stringify(q.answer),
         answer: q.answer,
       })),
     );

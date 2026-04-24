@@ -4,7 +4,7 @@ const questionAnswerPrompt = (
   topicsToFocus,
   numberOfQuestions,
 ) => `
-You are an AI trained to generate high-quality technical interview questions and answers.
+You are an AI specialized in technical interview preparation.
 
 Context:
 - Target Role: ${role}
@@ -12,27 +12,38 @@ Context:
 - Focus Topics: ${topicsToFocus}
 
 Instructions:
-1. Generate exactly ${numberOfQuestions || 5} technical interview questions.
-2. Each question must be relevant to the given role and experience level.
-3. Focus strictly on the provided topics.
-4. Questions should vary in difficulty (easy → medium → hard).
-5. Avoid repetition or vague questions.
-6. Each answer must be clear, concise, and technically accurate.
-7. Prefer practical, real-world oriented explanations where applicable.
+1. Generate exactly ${numberOfQuestions || 10} questions.
 
-Output Format (STRICT JSON, no extra text):
+2. Each item must follow STRICT JSON format:
+
 [
   {
     "question": "string",
-    "answer": "string"
+    "answer": {
+      "explanation": "string (plain text or markdown without code blocks)",
+      "bestPractices/comparisons/real time examples/etc anything relevant to the question": [
+        "bullet 1",
+        "bullet 2"
+      ],
+      "code": {
+        "language": "javascript | python | null",
+        "content": "raw code string WITHOUT backticks"
+      }
+    }
   }
 ]
 
-Rules:
-- Do not include explanations outside the JSON.
-- Do not include numbering outside the JSON structure.
-- Ensure valid JSON (no trailing commas, proper quotes).
-- Keep answers reasonably detailed but not overly long.
+3. Rules:
+- DO NOT use Markdown code fences anywhere.
+- DO NOT use triple backticks.
+- Code must be raw strings only.
+- Keep explanation readable (can include simple markdown like bullets).
+- If no code is needed, set:
+  "code": null
+
+4. Ensure answers scale from basic → advanced based on experience.
+
+5. Output ONLY valid JSON. No extra text.
 `;
 
 const conceptExplainPrompt = (question) => `
@@ -44,24 +55,60 @@ Concept:
 ${question}
 
 Instructions:
-1. Understand the concept and explain it in simple but accurate terms.
-2. Do NOT include extra sections, headings, or formatting.
-3. Keep the explanation structured internally but return only JSON.
-4. Avoid unnecessary jargon. If technical terms are used, they must be naturally explained within the text.
-5. Keep the explanation useful for both beginners and intermediate learners.
-6. If applicable, include a small example inside the explanation.
+1. Explain the concept in simple, accurate terms.
+2. The explanation MUST be structured, readable, and educational.
+
+3. The explanation MUST follow STRICT Markdown rules:
+
+Headings:
+- Use headings such as:
+  ### Explanation
+  ### Key Points
+  ### Example (only if applicable)
+- Always insert a blank line after each heading.
+
+Paragraphs:
+- Separate paragraphs with a blank line.
+
+Lists:
+- Use proper bullet formatting:
+  * Item 1
+  * Item 2
+
+Code Blocks (if applicable):
+- Must use triple backticks.
+- Must start on a new line.
+- Must include a language identifier (e.g. \`\`\`javascript).
+- Must end with triple backticks on a new line.
+- There must be a blank line before and after every code block.
+
+Correct example:
+
+### Example
+
+\`\`\`javascript
+const x = 10;
+console.log(x);
+\`\`\`
+
+Incorrect example (must never occur):
+### Examplejavascriptconst x = 10;
+
+4. Keep the explanation useful for both beginners and intermediate learners.
+5. Avoid unnecessary jargon. If technical terms are used, explain them naturally.
 
 Output MUST be valid JSON in exactly this format:
 
 {
   "title": "short, clear name of the concept",
-  "explanation": "detailed explanation of the concept in 2–6 short paragraphs"
+  "explanation": "Markdown formatted explanation string"
 }
 
 Rules:
-- Do not include markdown, backticks, or extra text.
-- Do not wrap response in code blocks.
-- Ensure valid JSON only.
+- Do not include any text outside the JSON.
+- Ensure valid JSON (escape quotes properly).
+- Do not break Markdown formatting.
+- Do not inline code examples; always use fenced code blocks.
 `;
 
 module.exports = {
