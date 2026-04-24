@@ -8,6 +8,7 @@ export default function QuestionCard({
   onLearnMore,
   isPinned,
   onTogglePin,
+  openLearMoreDrawer,
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [height, setHeight] = useState(0);
@@ -25,7 +26,7 @@ export default function QuestionCard({
   };
   return (
     <div
-      className={`w-[70%] border border-gray-200 shadow-2xl rounded-lg mb-10 p-5 flex flex-col ${isExpanded ? "gap-4" : ""}`}
+      className={`w-full border border-gray-200 shadow-2xl rounded-lg mb-10 p-5 flex flex-col group ${isExpanded ? "gap-4" : ""}`}
     >
       <div className=" flex items-center justify-between">
         <div className="flex gap-3 flex-1">
@@ -33,15 +34,23 @@ export default function QuestionCard({
           <h3>{question}</h3>
         </div>
         <div className="flex items-center justify-end gap-5 w-[25%]">
-          <span className="text-indigo-800 bg-indigo-100 px-2 py-1 rounded-lg cursor-pointer">
+          <button
+            className="text-indigo-800 bg-indigo-100 px-2 py-1 rounded-lg cursor-pointer hidden group-hover:block"
+            onClick={() => onTogglePin()}
+          >
             {isPinned ? <LuPinOff /> : <LuPin />}
-          </span>
-          <span className="flex items-center text-cyan-800 bg-cyan-100 px-2 py-1 rounded-lg cursor-pointer gap-2">
+          </button>
+          <button
+            className="items-center text-cyan-800 bg-cyan-100 px-2 py-1 rounded-lg cursor-pointer gap-2 hidden group-hover:flex"
+            onClick={() => onLearnMore()}
+          >
             <LuSparkles />
-            <span className="hidden md:inline text-sm font-medium">
+            <span
+              className={`hidden text-sm font-medium ${openLearMoreDrawer ? "md:hidden" : "md:inline"}`}
+            >
               Learn More
             </span>
-          </span>
+          </button>
           <button
             className={`text-2xl text-desc cursor-pointer ${isExpanded ? "rotate-180 transition-transform duration-75 ease-in-out" : ""}`}
             onClick={() => toggleExpand()}

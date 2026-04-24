@@ -7,33 +7,63 @@ import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 export default function AIResponsePreview({ answer }) {
   if (!answer) return null;
-  const { code, explanation, bestPractices } = answer;
 
+  const { code, explanation, bestPractices } = answer;
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
+      {/* Explanation */}
+      {explanation && (
+        <div>
+          {/* <h3 className="text-sm font-semibold text-gray-500 mb-2 uppercase">
+            Explanation
+          </h3> */}
+
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              h1: ({ ...props }) => (
+                <h1 className="text-lg font-semibold mt-4 mb-2" {...props} />
+              ),
+              h2: ({ ...props }) => (
+                <h2 className="text-base font-semibold mt-3 mb-2" {...props} />
+              ),
+              h3: ({ ...props }) => (
+                <h3 className="text-sm font-semibold mt-2 mb-1" {...props} />
+              ),
+              p: ({ ...props }) => (
+                <p
+                  className="mb-2 text-[14px] leading-relaxed text-gray-800"
+                  {...props}
+                />
+              ),
+              ul: ({ ...props }) => (
+                <ul className="mb-2 ml-4 list-disc" {...props} />
+              ),
+              li: ({ ...props }) => (
+                <li className="mb-1 text-[14px] text-gray-800" {...props} />
+              ),
+            }}
+          >
+            {explanation}
+          </ReactMarkdown>
+        </div>
+      )}
+
       {code && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 mb-2 uppercase">
+          {/* <h3 className="text-sm font-semibold text-gray-500 mb-2 uppercase">
             Code
-          </h3>
+          </h3> */}
           <CodeBlock code={code.content} language={code.language} />
         </div>
       )}
-      {explanation && (
-        <div>
-          <h3 className="text-sm font-semibold text-gray-500 mb-2 uppercase">
-            Explanation
-          </h3>
-          <p className="text-gray-800 text-[14px] leading-relaxed">
-            {explanation}
-          </p>
-        </div>
-      )}
+
+      {/* Best Practices */}
       {bestPractices && bestPractices.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 mb-2 uppercase">
+          {/* <h3 className="text-sm font-semibold text-gray-500 mb-2 uppercase">
             Best Practices
-          </h3>
+          </h3> */}
           <ul className="space-y-2">
             {bestPractices.map((item, index) => (
               <li
@@ -85,6 +115,7 @@ function CodeBlock({ code, language }) {
           )}
         </button>
       </div>
+
       <SyntaxHighlighter
         language={language || "text"}
         style={oneLight}

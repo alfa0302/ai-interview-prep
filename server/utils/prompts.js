@@ -14,24 +14,20 @@ Context:
 Instructions:
 1. Generate exactly ${numberOfQuestions || 10} questions.
 
-2. Each item must follow STRICT JSON format:
+2. Output MUST follow STRICT JSON format:
 
-[
-  {
-    "question": "string",
-    "answer": {
-      "explanation": "string (plain text or markdown without code blocks)",
-      "bestPractices/comparisons/real time examples/etc anything relevant to the question": [
-        "bullet 1",
-        "bullet 2"
-      ],
-      "code": {
-        "language": "javascript | python | null",
-        "content": "raw code string WITHOUT backticks"
-      }
-    }
+{
+  "title": "short descriptive title",
+  "explanation": "string (formatted with \\n, supports markdown like headings and lists)",
+  "bestPractices": [
+    "bullet 1",
+    "bullet 2"
+  ],
+  "code": {
+    "language": "javascript | python | null",
+    "content": "raw code string WITHOUT backticks"
   }
-]
+}
 
 3. Rules:
 - DO NOT use Markdown code fences anywhere.
@@ -44,71 +40,109 @@ Instructions:
 4. Ensure answers scale from basic → advanced based on experience.
 
 5. Output ONLY valid JSON. No extra text.
+
+6. JSON Safety Rules:
+- The explanation MUST be structured like this:
+
+"explanation": "## Definition\n...\n\n## How it works\n- step 1\n- step 2\n\n## Why it works\n...\n\n## Example\n...\n\n## Pitfalls\n...\n\n## Real-world usage\n..."
+
+- You MUST use section headings (##)
+- You MUST use bullet points (-)
+- You MUST use \\n properly
 `;
 
 const conceptExplainPrompt = (question) => `
 You are an expert technical educator.
 
-Your task is to explain the given concept clearly and concisely.
-
 Concept:
 ${question}
 
-Instructions:
-1. Explain the concept in simple, accurate terms.
-2. The explanation MUST be structured, readable, and educational.
+Your goal is to explain the concept clearly, deeply, and in a way that is easy to read.
 
-3. The explanation MUST follow STRICT Markdown rules:
+---
 
-Headings:
-- Use headings such as:
-  ### Explanation
-  ### Key Points
-  ### Example (only if applicable)
-- Always insert a blank line after each heading.
-
-Paragraphs:
-- Separate paragraphs with a blank line.
-
-Lists:
-- Use proper bullet formatting:
-  * Item 1
-  * Item 2
-
-Code Blocks (if applicable):
-- Must use triple backticks.
-- Must start on a new line.
-- Must include a language identifier (e.g. \`\`\`javascript).
-- Must end with triple backticks on a new line.
-- There must be a blank line before and after every code block.
-
-Correct example:
-
-### Example
-
-\`\`\`javascript
-const x = 10;
-console.log(x);
-\`\`\`
-
-Incorrect example (must never occur):
-### Examplejavascriptconst x = 10;
-
-4. Keep the explanation useful for both beginners and intermediate learners.
-5. Avoid unnecessary jargon. If technical terms are used, explain them naturally.
-
-Output MUST be valid JSON in exactly this format:
+1. Output MUST follow STRICT JSON format:
 
 {
-  "title": "short, clear name of the concept",
-  "explanation": "Markdown formatted explanation string"
+  "title": "short descriptive title or null",
+  "explanation": "markdown formatted string",
+  "bestPractices": [
+    "bullet 1",
+    "bullet 2"
+  ],
+  "code": {
+    "language": "javascript | python | null",
+    "content": "raw code string WITHOUT backticks"
+  }
 }
 
-Rules:
-- Do not include any text outside the JSON.
-- Ensure valid JSON (escape quotes properly).
-- Do not break Markdown formatting.
-- Do not inline code examples; always use fenced code blocks.
+---
+
+2. Explanation Guidelines:
+
+The explanation MUST:
+- Start with a simple, intuitive definition
+- Then expand into deeper explanation
+- Include reasoning (why/how it works)
+- Include at least one example
+- Optionally include a real-world or production example
+
+---
+
+3. Formatting Rules (IMPORTANT):
+
+- The explanation MUST be readable and well-structured
+- Use markdown NATURALLY where helpful:
+  * headings (##) when useful
+  * bullet points (-) for lists
+  * paragraphs for explanation
+- DO NOT force a fixed template
+- DO NOT always use the same sections
+- DO NOT return one large paragraph
+- Break content using \\n\\n between logical sections
+- Prefer smaller chunks over dense text
+
+GOOD examples:
+- mix of paragraphs + bullets
+- small sections with headings
+- step-by-step explanation
+- comparison-style explanation
+
+BAD examples:
+- one long paragraph
+- overly rigid repeated sections
+
+---
+
+4. Code Rules:
+
+- Only include code if it improves understanding
+- Keep it minimal
+- No backticks
+- If not needed, return "code": null
+
+---
+
+5. Best Practices:
+
+- Include real-world advice when relevant
+- Include common mistakes or edge cases if applicable
+- If none apply, return []
+
+---
+
+6. Title Rules:
+
+- Keep it short (3–8 words)
+- If unclear, return null
+
+---
+
+7. Final Rules:
+
+- Output ONLY valid JSON
+- Do NOT include markdown code fences
+- Ensure JSON.parse works without modification
 `;
 
 module.exports = {
