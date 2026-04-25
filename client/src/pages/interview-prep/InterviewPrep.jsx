@@ -16,6 +16,8 @@ import Drawer from "../../components/Drawer";
 export default function InterviewPrep() {
   const { sessionId } = useParams();
   const [sessionData, setSessionData] = useState(null);
+
+  console.log(sessionData);
   const [error, setError] = useState("");
   const [openLearMoreDrawer, setOpenLearnMoreDrawer] = useState(false);
   const [explanation, setExplanation] = useState(null);
@@ -55,7 +57,39 @@ export default function InterviewPrep() {
       setIsLoading(false);
     }
   };
-  const uploadMoreQuestions = async () => {};
+  const uploadMoreQuestions = async () => {
+    try {
+      setIsUpdateLoader(true);
+      const aiResponse = await axiosInstance.post(
+        API_PATHS.AI.GENERATE_QUESTIONS,
+        {
+          role: sessionData?.role,
+          experience: sessionData?.experience,
+          topicsToFocus: sessionData?.topicsToFocus,
+          numberOfQuestions: 10,
+        },
+      );
+      const generatedQuestions = aiResponse.data;
+
+      const response = await axiosInstance.post(
+        API_PATHS.QUESTIONS.ADD_TO_SESSION,
+        {
+          sessionId,
+          questions: generatedQuestions,
+        },
+      );
+      if (response.data) {
+        toast.success("Added more Q&A!!");
+        fetchSessionData();
+      }
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        setError("Something went wrong. Please try again");
+      }
+    } finally {
+      setIsUpdateLoader(false);
+    }
+  };
 
   const toggleQuestionPin = async (questionId) => {
     try {
@@ -91,9 +125,9 @@ export default function InterviewPrep() {
           }
         />
       )}
-      <div className="px-10 grid grid-cols-12 md:gap-3">
+      <div className="md:px-10 px-2 grid grid-cols-12 md:gap-3 relative">
         <div
-          className={`col-span-12 ${openLearMoreDrawer ? "md:col-span-7" : "md:col-span-8"}`}
+          className={`col-span-12 ${openLearMoreDrawer ? "lg:col-span-7" : "lg:col-span-8"}`}
         >
           <h3 className="text-xl font-semibold mb-5 mt-5">Interview Q&A</h3>
           <AnimatePresence>
@@ -108,7 +142,7 @@ export default function InterviewPrep() {
                     duration: 0.4,
                     type: "spring",
                     stiffness: 100,
-                    dealy: index * 0.1,
+                    delay: index * 0.1,
                     damping: 15,
                   }}
                   layout
@@ -122,26 +156,47 @@ export default function InterviewPrep() {
                     onTogglePin={() => toggleQuestionPin(data._id)}
                     openLearMoreDrawer={openLearMoreDrawer}
                   />
+                  {!isLoading &&
+                    sessionData?.questions?.length == index + 1 && (
+                      <div className="flex justify-center">
+                        <button
+                          className="bg-black text-white flex gap-2 items-center justify-center px-2 py-1 cursor-pointer"
+                          disabled={isLoading || isUpdateLoader}
+                          onClick={uploadMoreQuestions}
+                        >
+                          {isUpdateLoader ? (
+                            <SpinnerLoader />
+                          ) : (
+                            <LuListCollapse />
+                          )}
+                          <span>Load More</span>
+                        </button>
+                      </div>
+                    )}
                 </motion.div>
               );
             })}
           </AnimatePresence>
         </div>
-        <div className="md:col-span-5 col-span-12 flex justify-center items-center shadow-2xl ">
-          <Drawer
-            isOpen={openLearMoreDrawer}
-            onClose={() => setOpenLearnMoreDrawer(false)}
-            title={!isLoading && explanation?.title}
-          >
-            {error && (
-              <p className="flex gap-2 text-sm text-amber-600 font-medium">
-                <LuCircleAlert className="mt-1" /> {error}
-              </p>
-            )}
-            {!isLoading && explanation && (
-              <AIResponsePreview answer={explanation} />
-            )}
-          </Drawer>
+        <div
+          className={`lg:col-span-5 col-span-12 flex justify-center items-center shadow-2xl bg-white ${openLearMoreDrawer ? "absolute md:relative top-0 left-0 right-0" : ""}`}
+        >
+          {openLearMoreDrawer && (
+            <Drawer
+              isOpen={openLearMoreDrawer}
+              onClose={() => setOpenLearnMoreDrawer(false)}
+              title={!isLoading && explanation?.title}
+            >
+              {error && (
+                <p className="flex gap-2 text-sm text-amber-600 font-medium">
+                  <LuCircleAlert className="mt-1" /> {error}
+                </p>
+              )}
+              {!isLoading && explanation && (
+                <AIResponsePreview answer={explanation} />
+              )}
+            </Drawer>
+          )}
         </div>
         {isLoading && (
           <div className="bg-gray-300 opacity-50 fixed top-0 bottom-0 left-0 right-0 flex justify-center items-center">

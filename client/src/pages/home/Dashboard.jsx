@@ -27,14 +27,19 @@ export default function Dashboard() {
       console.error("Error fetching session data: ", error);
     }
   };
-  const deleteSession = async (sessionData) => {
-    // console.log(sessionData._id);
-    // return console.log("reached");
-    const response = await axiosInstance.delete(API_PATHS.SESSIONS.DELETE, {
-      params: {
-        id: sessionData._id,
-      },
-    });
+  const deleteSession = async (id) => {
+    try {
+      const response = await axiosInstance.delete(
+        API_PATHS.SESSIONS.DELETE(id),
+      );
+      if (response.data) {
+        toast.success("Session Deleted!");
+        fetchAllSessions();
+      }
+    } catch (error) {
+      toast.error("Couldn't delete session");
+      console.log("Session could not be deleted", error);
+    }
   };
   useEffect(() => {
     fetchAllSessions();
@@ -58,7 +63,8 @@ export default function Dashboard() {
                   : ""
               }
               onSelect={() => navigate(`/interview-prep/${data?._id}`)}
-              onDelete={() => setOpenDeleteAlert({ open: true, data })}
+              // onDelete={() => setOpenDeleteAlert({ open: true, data })}
+              onDelete={() => deleteSession(data?._id)}
             />
           ))}
         </div>

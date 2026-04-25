@@ -17,15 +17,14 @@ Instructions:
 2. Output MUST follow STRICT JSON format:
 
 {
-  "title": "short descriptive title",
-  "explanation": "string (formatted with \\n, supports markdown like headings and lists)",
-  "bestPractices": [
-    "bullet 1",
-    "bullet 2"
-  ],
-  "code": {
-    "language": "javascript | python | null",
-    "content": "raw code string WITHOUT backticks"
+  "question": "The actual interview question text",
+  "answer": {
+     "explanation": "markdown string",
+     "code": {
+        "language": "javascript | python | null",
+        "content": "raw code string"
+      },
+     "bestPractices": [...]
   }
 }
 
@@ -34,8 +33,6 @@ Instructions:
 - DO NOT use triple backticks.
 - Code must be raw strings only.
 - Keep explanation readable (can include simple markdown like bullets).
-- If no code is needed, set:
-  "code": null
 
 4. Ensure answers scale from basic → advanced based on experience.
 
